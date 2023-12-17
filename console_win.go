@@ -215,19 +215,13 @@ func (s *cScreen) Init() error {
 
 	s.fini = false
 	s.setInMode(modeResizeEn | modeExtndFlg)
-
-	// 24-bit color is opt-in for now, because we can't figure out
-	// to make it work consistently.
-	if s.truecolor {
-		s.setOutMode(modeVtOutput | modeNoAutoNL | modeCookedOut)
-		var omode uint32
-		s.getOutMode(&omode)
-		if omode&modeVtOutput == modeVtOutput {
-			s.vten = true
-		} else {
-			s.truecolor = false
-		}
+	s.setOutMode(modeVtOutput | modeNoAutoNL | modeCookedOut)
+	var omode uint32
+	s.getOutMode(&omode)
+	if omode&modeVtOutput == modeVtOutput {
+		s.vten = true
 	} else {
+		s.truecolor = false
 		s.setOutMode(0)
 	}
 
