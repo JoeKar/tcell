@@ -146,6 +146,8 @@ const (
 	vtSetBg      = "\x1b[48;5;%dm"
 	vtSetFgRGB   = "\x1b[38;2;%d;%d;%dm" // RGB
 	vtSetBgRGB   = "\x1b[48;2;%d;%d;%dm" // RGB
+	vtEnterCA    = "\x1b[?1049h\x1b[22;0;0t" // activate alternate screen + store title
+	vtExitCA     = "\x1b[?1049l\x1b[23;0;0t" // deactivate alternate screen + restore title
 )
 
 // NewConsoleScreen returns a Screen for the Windows console associated
@@ -225,6 +227,10 @@ func (s *cScreen) Init() error {
 		s.setOutMode(0)
 	}
 
+	if s.vten {
+		s.emitVtString(vtEnterCA)
+	}
+
 	s.clearScreen(s.style)
 	s.hideCursor()
 	s.Unlock()
@@ -251,6 +257,10 @@ func (s *cScreen) Fini() {
 }
 
 func (s *cScreen) finish() {
+	if s.vten {
+		s.emitVtString(vtExitCA)
+	}
+
 	s.Lock()
 	s.style = StyleDefault
 	s.curx = -1
